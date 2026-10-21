@@ -2,9 +2,9 @@
 
 ## Asisten AI
 
-Widget asisten menggunakan endpoint serverless `api/chat.js` dan Gemini API (`gemini-2.5-flash`). Gemini menyediakan free tier dengan kuota dan ketersediaan yang dapat berubah. Penggunaan layanan gratis dapat tunduk pada kebijakan Google terkait penggunaan data; jangan kirim informasi sensitif.
+Widget asisten menggunakan endpoint serverless `api/chat.js` dan Gemini Interactions API (`gemini-3.8-flash`). Gemini menyediakan free tier dengan kuota dan ketersediaan yang dapat berubah. Penggunaan layanan gratis dapat tunduk pada kebijakan Google terkait penggunaan data; jangan kirim informasi sensitif.
 
-Buat API key gratis di [Google AI Studio](https://aistudio.google.com/app/apikey), lalu simpan sebagai environment variable `GEMINI_API_KEY` di project Vercel. Jangan menaruh key di frontend atau di variable yang diawali `VITE_`. `GEMINI_MODEL` bersifat opsional; default-nya `gemini-2.5-flash`.
+Buat API key gratis di [Google AI Studio](https://aistudio.google.com/app/apikey), lalu simpan sebagai environment variable `GEMINI_API_KEY` di project Vercel. Jangan menaruh key di frontend atau di variable yang diawali `VITE_`. `GEMINI_MODEL` bersifat opsional; default-nya `gemini-3.8-flash`.
 
 Untuk menjalankan secara lokal di PowerShell:
 

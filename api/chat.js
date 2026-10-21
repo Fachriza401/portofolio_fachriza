@@ -127,10 +127,10 @@ export default async function chatHandler(req, res) {
   const timeout = setTimeout(() => controller.abort(), 8_000);
 
   try {
-    const defaultModel = 'gemini-2.5-flash';
+    const defaultModel = 'gemini-3.8-flash';
     const configuredModel = process.env.GEMINI_MODEL || defaultModel;
     const requestModel = (model) => fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+      'https://generativelanguage.googleapis.com/v1beta/interactions',
       {
         method: 'POST',
         headers: {
@@ -138,15 +138,12 @@ export default async function chatHandler(req, res) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          systemInstruction: { parts: [{ text: portfolioContext }] },
-          contents: messages.map(({ role, content }) => ({
-            role: role === 'assistant' ? 'model' : 'user',
-            parts: [{ text: content }]
-          })),
-          generationConfig: {
-            maxOutputTokens: 450,
-            temperature: 0.7
-          }
+          model,
+          system_instruction: portfolioContext,
+          input: messages.map(({ role, content }) =>
+            `${role === 'assistant' ? 'Asisten' : 'Pengunjung'}: ${content}`
+          ).join('\n\n'),
+          store: false
         }),
         signal: controller.signal
       }
@@ -179,14 +176,16 @@ export default async function chatHandler(req, res) {
       }
       if (response.status === 404) {
         const detail = providerMessage ? ` Detail dari Google: ${providerMessage.slice(0, 220)}` : '';
-        return sendJson(res, 503, { error: `Request Gemini untuk model "${model}" tidak ditemukan.${detail} Pastikan Gemini API aktif untuk project API key.` });
+        return sendJson(res, 503, { error: `Model/interaksi Gemini "${model}" tidak tersedia untuk API key ini.${detail} Periksa akses model di Google AI Studio.` });
       }
       return sendJson(res, 502, { error: 'Asisten AI sedang mengalami kendala. Coba lagi sebentar.' });
     }
 
     const result = await response.json();
-    const reply = result.candidates?.[0]?.content?.parts
-      ?.map((part) => part.text || '')
+    const reply = result.steps
+      ?.filter((step) => step.type === 'model_output')
+      .flatMap((step) => step.content || [])
+      .map((part) => part.text || '')
       .join('')
       .trim();
     if (!reply) {
