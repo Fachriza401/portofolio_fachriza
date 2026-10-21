@@ -15,6 +15,8 @@ npm run dev
 
 Di Vercel, tambahkan `GEMINI_API_KEY` pada Project Settings → Environment Variables, lalu deploy ulang. Endpoint chat membatasi panjang pesan dan jumlah pesan per request serta menerapkan rate limit sederhana per IP.
 
+Konteks asisten dirangkai dari data profil, proyek, skill, pengalaman, dan sertifikat di `src/`, sehingga mengikuti isi portfolio. Estimasi awal untuk website sederhana adalah Rp800.000 untuk penggunaan lokal saja atau Rp1.600.000 termasuk deployment. Harga final, kebutuhan fitur, dan biaya domain/hosting harus dikonfirmasi terpisah dengan Fachriza.
+
 ## React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
