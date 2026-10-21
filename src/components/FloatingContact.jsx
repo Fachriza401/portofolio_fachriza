@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, ArrowUp } from 'lucide-react';
 import { profile } from '../config/profile';
+import ChatAssistant from './ChatAssistant';
 
 const isConfigured = (value, placeholder) => Boolean(value) && value !== placeholder;
 
@@ -41,6 +42,8 @@ const FloatingContact = () => {
           </motion.button>
         )}
       </AnimatePresence>
+
+      <ChatAssistant />
 
       {whatsappNumber && (
         <motion.a

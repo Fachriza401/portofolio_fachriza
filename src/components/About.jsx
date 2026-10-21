@@ -1,10 +1,12 @@
 import { motion, useReducedMotion } from 'framer-motion';
+import { useState } from 'react';
 import { MapPin, GraduationCap, Target, Clock, Code2, Smartphone, Palette } from 'lucide-react';
 import { profile } from '../config/profile';
 import SectionTitle from './SectionTitle';
 
 const About = () => {
   const shouldReduceMotion = useReducedMotion();
+  const [profileRevealed, setProfileRevealed] = useState(false);
   const badges = [
     { label: 'Web Development', icon: Code2 },
     { label: 'Mobile App', icon: Smartphone },
@@ -52,6 +54,14 @@ const About = () => {
       transition: { duration: shouldReduceMotion ? 0 : 0.55, ease: 'easeOut' }
     }
   };
+  const profileVariants = {
+    hidden: { opacity: 0, scale: shouldReduceMotion ? 1 : 0.04 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: shouldReduceMotion ? 0 : 0.85, ease: [0.22, 1, 0.36, 1] }
+    }
+  };
 
   return (
     <section id='about' className='section about-section'>
@@ -66,13 +76,19 @@ const About = () => {
         >
           <motion.div className='about-image' variants={itemVariants}>
             <div className='about-profile-frame'>
-              <div className='about-profile'>
-                <img src={profile.profileImage} alt={profile.name} />
-                <div className='about-profile-caption'>
-                  <span>Mahasiswa Sistem Informasi</span>
-                  <strong>{profile.education.univ.school}</strong>
+              <motion.div
+                className={`about-profile-orbit${profileRevealed ? ' is-revealed' : ''}`}
+                variants={profileVariants}
+                onAnimationComplete={() => setProfileRevealed(true)}
+              >
+                <div className='about-profile'>
+                  <img src='/images/about-profile.png' alt={profile.name} />
+                  <div className='about-profile-caption'>
+                    <span>Mahasiswa Sistem Informasi</span>
+                    <strong>{profile.education.univ.school}</strong>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
               <span className='about-frame-corner about-frame-corner-top' aria-hidden='true' />
               <span className='about-frame-corner about-frame-corner-bottom' aria-hidden='true' />
             </div>
@@ -83,9 +99,6 @@ const About = () => {
             <motion.span className='about-kicker' variants={itemVariants}>
               PROFIL SINGKAT
             </motion.span>
-            <motion.h3 className='about-heading' variants={itemVariants}>
-              Halo, saya <span>{profile.name.split(' ')[0]}.</span>
-            </motion.h3>
             <motion.p variants={itemVariants}>
               Saya mahasiswa Sistem Informasi di {profile.education.univ.school}, dengan latar belakang
               Teknik Komputer dan Jaringan dari {profile.education.smk.school}. Perpaduan keduanya membentuk
