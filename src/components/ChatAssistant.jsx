@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bot, LoaderCircle, Send, Sparkles, X } from 'lucide-react';
+import { Bot, LoaderCircle, MessageCircle, Send, X } from 'lucide-react';
 
 const welcomeMessage = {
   role: 'assistant',
@@ -87,7 +87,7 @@ const ChatAssistant = () => {
         whileHover={{ y: -3 }}
         whileTap={{ scale: 0.92 }}
       >
-        {isOpen ? <X size={21} /> : <Sparkles size={21} />}
+        {isOpen ? <X size={21} /> : <MessageCircle size={21} />}
       </motion.button>
 
       <AnimatePresence>
