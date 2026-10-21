@@ -128,6 +128,7 @@ export default async function chatHandler(req, res) {
 
   try {
     const defaultModel = 'gemini-3.8-flash';
+    const fallbackModel = 'gemini-flash-lite-latest';
     const configuredModel = process.env.GEMINI_MODEL || defaultModel;
     const requestModel = (model) => fetch(
       'https://generativelanguage.googleapis.com/v1beta/interactions',
@@ -148,12 +149,16 @@ export default async function chatHandler(req, res) {
         signal: controller.signal
       }
     );
-    let model = configuredModel;
-    let response = await requestModel(model);
-    if (response.status === 404 && model !== defaultModel) {
-      console.error(`Configured Gemini model "${model}" was not found; retrying with "${defaultModel}".`);
-      model = defaultModel;
+    const modelsToTry = [...new Set([configuredModel, defaultModel, fallbackModel])];
+    let model = modelsToTry[0];
+    let response;
+    for (const candidate of modelsToTry) {
+      model = candidate;
       response = await requestModel(model);
+      if (response.ok || ![404, 503].includes(response.status)) break;
+      if (candidate !== modelsToTry.at(-1)) {
+        console.error(`Gemini model "${candidate}" returned ${response.status}; trying a fallback model.`);
+      }
     }
 
     if (!response.ok) {
