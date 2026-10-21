@@ -127,8 +127,9 @@ export default async function chatHandler(req, res) {
   const timeout = setTimeout(() => controller.abort(), 8_000);
 
   try {
-    const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-    const response = await fetch(
+    const defaultModel = 'gemini-2.5-flash';
+    const configuredModel = process.env.GEMINI_MODEL || defaultModel;
+    const requestModel = (model) => fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
       {
         method: 'POST',
@@ -150,6 +151,13 @@ export default async function chatHandler(req, res) {
         signal: controller.signal
       }
     );
+    let model = configuredModel;
+    let response = await requestModel(model);
+    if (response.status === 404 && model !== defaultModel) {
+      console.error(`Configured Gemini model "${model}" was not found; retrying with "${defaultModel}".`);
+      model = defaultModel;
+      response = await requestModel(model);
+    }
 
     if (!response.ok) {
       console.error(`Gemini request failed with status ${response.status}.`);
@@ -163,7 +171,7 @@ export default async function chatHandler(req, res) {
         return sendJson(res, 503, { error: 'API key Gemini tidak valid atau belum memiliki akses. Periksa GEMINI_API_KEY di Vercel.' });
       }
       if (response.status === 404) {
-        return sendJson(res, 503, { error: 'Model Gemini tidak tersedia. Periksa pengaturan GEMINI_MODEL di Vercel.' });
+        return sendJson(res, 503, { error: `Model Gemini "${model}" tidak ditemukan. Hapus GEMINI_MODEL dari Vercel agar model default digunakan.` });
       }
       return sendJson(res, 502, { error: 'Asisten AI sedang mengalami kendala. Coba lagi sebentar.' });
     }
