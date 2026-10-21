@@ -178,7 +178,8 @@ export default async function chatHandler(req, res) {
         const detail = providerMessage ? ` Detail dari Google: ${providerMessage.slice(0, 220)}` : '';
         return sendJson(res, 503, { error: `Model/interaksi Gemini "${model}" tidak tersedia untuk API key ini.${detail} Periksa akses model di Google AI Studio.` });
       }
-      return sendJson(res, 502, { error: 'Asisten AI sedang mengalami kendala. Coba lagi sebentar.' });
+      const detail = providerMessage ? ` Detail dari Google: ${providerMessage.slice(0, 220)}` : '';
+      return sendJson(res, 502, { error: `Gemini API mengembalikan HTTP ${response.status}.${detail} Coba lagi nanti.` });
     }
 
     const result = await response.json();
@@ -198,8 +199,11 @@ export default async function chatHandler(req, res) {
     if (error.name === 'AbortError') {
       return sendJson(res, 504, { error: 'Asisten AI membutuhkan waktu terlalu lama. Silakan coba lagi.' });
     }
-    console.error('Gemini request could not be completed.', error);
-    return sendJson(res, 502, { error: 'Tidak dapat menghubungi asisten AI. Periksa koneksi lalu coba lagi.' });
+    const diagnostic = String(error.message || 'Unknown error')
+      .replaceAll(apiKey, '[redacted]')
+      .slice(0, 180);
+    console.error('Gemini request could not be completed.', diagnostic);
+    return sendJson(res, 502, { error: `Tidak dapat menghubungi Gemini API: ${diagnostic}` });
   } finally {
     clearTimeout(timeout);
   }
