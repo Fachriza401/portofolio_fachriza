@@ -4,6 +4,7 @@ import { Bot, LoaderCircle, Send, Sparkles, X } from 'lucide-react';
 
 const welcomeMessage = {
   role: 'assistant',
+  localOnly: true,
   content: 'Halo! Saya asisten AI portfolio Fachriza. Mau bertanya tentang proyek, skill, atau ingin diskusi ide?'
 };
 
@@ -46,7 +47,7 @@ const ChatAssistant = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: conversation
-            .filter((message) => message.role === 'user' || message.role === 'assistant')
+            .filter((message) => !message.localOnly)
             .slice(-12)
             .map(({ role, content: messageContent }) => ({ role, content: messageContent }))
         })

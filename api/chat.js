@@ -101,6 +101,7 @@ export default async function chatHandler(req, res) {
     !Array.isArray(messages) ||
     messages.length === 0 ||
     messages.length > MAX_MESSAGES ||
+    messages[0]?.role !== 'user' ||
     messages.some(
       (message) =>
         !message ||
@@ -154,6 +155,15 @@ export default async function chatHandler(req, res) {
       console.error(`Gemini request failed with status ${response.status}.`);
       if (response.status === 429) {
         return sendJson(res, 429, { error: 'Kuota gratis AI sedang mencapai batas. Coba lagi nanti.' });
+      }
+      if (response.status === 400) {
+        return sendJson(res, 502, { error: 'Gemini menolak format percakapan. Coba mulai chat baru.' });
+      }
+      if (response.status === 401 || response.status === 403) {
+        return sendJson(res, 503, { error: 'API key Gemini tidak valid atau belum memiliki akses. Periksa GEMINI_API_KEY di Vercel.' });
+      }
+      if (response.status === 404) {
+        return sendJson(res, 503, { error: 'Model Gemini tidak tersedia. Periksa pengaturan GEMINI_MODEL di Vercel.' });
       }
       return sendJson(res, 502, { error: 'Asisten AI sedang mengalami kendala. Coba lagi sebentar.' });
     }
