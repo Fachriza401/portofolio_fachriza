@@ -160,7 +160,14 @@ export default async function chatHandler(req, res) {
     }
 
     if (!response.ok) {
-      console.error(`Gemini request failed with status ${response.status}.`);
+      let providerMessage = '';
+      try {
+        const errorResult = await response.json();
+        providerMessage = errorResult.error?.message || '';
+      } catch (error) {
+        console.error('Could not read Gemini error response.', error);
+      }
+      console.error(`Gemini request failed with status ${response.status}: ${providerMessage.slice(0, 300)}`);
       if (response.status === 429) {
         return sendJson(res, 429, { error: 'Kuota gratis AI sedang mencapai batas. Coba lagi nanti.' });
       }
@@ -171,7 +178,8 @@ export default async function chatHandler(req, res) {
         return sendJson(res, 503, { error: 'API key Gemini tidak valid atau belum memiliki akses. Periksa GEMINI_API_KEY di Vercel.' });
       }
       if (response.status === 404) {
-        return sendJson(res, 503, { error: `Model Gemini "${model}" tidak ditemukan. Hapus GEMINI_MODEL dari Vercel agar model default digunakan.` });
+        const detail = providerMessage ? ` Detail dari Google: ${providerMessage.slice(0, 220)}` : '';
+        return sendJson(res, 503, { error: `Request Gemini untuk model "${model}" tidak ditemukan.${detail} Pastikan Gemini API aktif untuk project API key.` });
       }
       return sendJson(res, 502, { error: 'Asisten AI sedang mengalami kendala. Coba lagi sebentar.' });
     }
