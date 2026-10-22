@@ -119,47 +119,31 @@
 .portfolio-stats {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  justify-content: flex-start;
+  gap: clamp(2rem, 5vw, 4rem);
   margin-top: 1.6rem;
 }
 
 .portfolio-stat {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  min-width: 190px;
-  padding: 0.7rem 0.9rem;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--glass);
-  backdrop-filter: blur(12px);
-}
-
-.portfolio-stat-icon {
   display: grid;
-  width: 36px;
-  height: 36px;
-  flex: 0 0 36px;
-  place-items: center;
-  border: 1px solid rgba(71, 118, 230, 0.28);
-  border-radius: 11px;
-  background: rgba(71, 118, 230, 0.12);
-  color: #55cfc3;
+  min-width: 130px;
+  gap: 0.25rem;
+  text-align: center;
 }
 
-.portfolio-stat-copy {
-  display: grid;
-  gap: 0.05rem;
+.portfolio-stat strong {
+  color: var(--text-primary);
+  font-size: clamp(1.8rem, 3vw, 2.35rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
 }
 
-.portfolio-stat-copy strong {
-  font-size: 1rem;
-  line-height: 1.2;
-}
-
-.portfolio-stat-copy > span {
+.portfolio-stat > span {
   color: var(--text-tertiary);
-  font-size: 0.72rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
 }
 
 .hero-card-section {
@@ -243,10 +227,17 @@
   }
 
   .portfolio-stat {
-    min-width: min(165px, calc(50% - 0.3rem));
-    flex: 1 1 145px;
-    padding: 0.65rem;
-    text-align: left;
+    min-width: min(145px, calc(50% - 0.3rem));
+    flex: 1 1 120px;
+    gap: 0.35rem;
+  }
+
+  .portfolio-stat strong {
+    font-size: 1.85rem;
+  }
+
+  .portfolio-stat > span {
+    font-size: 0.7rem;
   }
 
   .hero-card-section,
