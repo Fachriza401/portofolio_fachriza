@@ -15,6 +15,10 @@ npm run dev
 
 Di Vercel, tambahkan `GEMINI_API_KEY` pada Project Settings → Environment Variables, lalu deploy ulang. Endpoint chat membatasi panjang pesan dan jumlah pesan per request serta menerapkan rate limit sederhana per IP.
 
+## Statistik kunjungan
+
+Penghitung publik memakai Upstash Redis agar angka kunjungan dibagikan antar-pengunjung dan tersimpan saat deployment baru. Buat database Redis gratis melalui Upstash/Vercel Marketplace, lalu atur `UPSTASH_REDIS_REST_URL` dan `UPSTASH_REDIS_REST_TOKEN` di environment Vercel. Integrasi Vercel KV dengan nama `KV_REST_API_URL` dan `KV_REST_API_TOKEN` juga didukung. Tanpa konfigurasi database, UI menampilkan tanda `—`, bukan angka perkiraan. Counter menghitung kunjungan per sesi browser (bukan pengunjung unik).
+
 Konteks asisten dirangkai dari data profil, proyek, skill, pengalaman, dan sertifikat di `src/`, sehingga mengikuti isi portfolio. Estimasi awal untuk website sederhana adalah Rp800.000 untuk penggunaan lokal saja atau Rp1.600.000 termasuk deployment. Harga final, kebutuhan fitur, dan biaya domain/hosting harus dikonfirmasi terpisah dengan Fachriza.
 
 ## React + Vite

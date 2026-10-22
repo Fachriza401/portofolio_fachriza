@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { profile } from '../config/profile';
 import IdentityCard from './IdentityCard';
+import PortfolioStats from './PortfolioStats';
 
 const Hero = () => {
   return (
@@ -74,6 +75,7 @@ const Hero = () => {
               Hubungi Saya
             </motion.a>
           </motion.div>
+          <PortfolioStats />
         </motion.div>
         <motion.div
           className='hero-card-section'

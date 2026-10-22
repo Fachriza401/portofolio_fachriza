@@ -116,6 +116,52 @@
   gap: 0.9rem;
 }
 
+.portfolio-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.6rem;
+}
+
+.portfolio-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 190px;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+}
+
+.portfolio-stat-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  place-items: center;
+  border: 1px solid rgba(71, 118, 230, 0.28);
+  border-radius: 11px;
+  background: rgba(71, 118, 230, 0.12);
+  color: #55cfc3;
+}
+
+.portfolio-stat-copy {
+  display: grid;
+  gap: 0.05rem;
+}
+
+.portfolio-stat-copy strong {
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.portfolio-stat-copy > span {
+  color: var(--text-tertiary);
+  font-size: 0.72rem;
+}
+
 .hero-card-section {
   display: flex;
   justify-content: center;
@@ -145,6 +191,10 @@
   }
 
   .hero-buttons {
+    justify-content: center;
+  }
+
+  .portfolio-stats {
     justify-content: center;
   }
 }
@@ -185,6 +235,18 @@
     justify-content: center;
     padding: 0.8rem 1rem;
     font-size: 0.88rem;
+  }
+
+  .portfolio-stats {
+    gap: 0.55rem;
+    margin-top: 1.2rem;
+  }
+
+  .portfolio-stat {
+    min-width: min(165px, calc(50% - 0.3rem));
+    flex: 1 1 145px;
+    padding: 0.65rem;
+    text-align: left;
   }
 
   .hero-card-section,

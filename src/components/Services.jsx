@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import { Code, Smartphone, Palette, Database, Settings } from 'lucide-react';
+import { Code, Smartphone, Palette, Database, Settings, FileText } from 'lucide-react';
 import SectionTitle from './SectionTitle';
 
 const Services = () => {
@@ -9,7 +9,8 @@ const Services = () => {
     { icon: Smartphone, number: '02', title: 'Mobile App', desc: 'Aplikasi Android/mobile menggunakan Flutter dan Dart.' },
     { icon: Palette, number: '03', title: 'UI/UX Design', desc: 'Desain interface modern yang fokus pada usability dan visual experience.' },
     { icon: Database, number: '04', title: 'System Information', desc: 'Sistem informasi untuk kebutuhan sekolah, bisnis dan organisasi.' },
-    { icon: Settings, number: '05', title: 'Maintenance & Improvement', desc: 'Membantu memperbaiki, mengembangkan dan meningkatkan aplikasi yang sudah ada.' }
+    { icon: Settings, number: '05', title: 'Maintenance & Improvement', desc: 'Membantu memperbaiki, mengembangkan dan meningkatkan aplikasi yang sudah ada.' },
+    { icon: FileText, number: '06', title: 'Perapihan Laporan Kuliah', desc: 'Membantu merapikan struktur, format, tata bahasa, dan konsistensi laporan berdasarkan materi serta data yang disediakan mahasiswa.' }
   ];
   const gridVariants = {
     hidden: {},
