@@ -431,9 +431,11 @@ const paintFace = (canvas, image, color, fit) => {
   if (image) drawFitted(ctx, image, canvas.width, canvas.height, fit);
 };
 
-const paintStrap = (canvas, image, color) => {
+const paintStrap = (canvas, image, color, label, strapLength, strapWidth) => {
   const across = 192;
-  const along = image ? Math.max(64, Math.round((image.width / image.height) * across)) : across * 2;
+  const along = image
+    ? Math.max(label ? 112 : 64, Math.round((image.width / image.height) * across))
+    : Math.max(64, Math.round((strapLength / strapWidth) * across));
   canvas.width = across;
   canvas.height = along;
   const ctx = canvas.getContext('2d');
@@ -443,18 +445,29 @@ const paintStrap = (canvas, image, color) => {
   if (image) {
     ctx.save();
     ctx.translate(across, 0);
-    ctx.rotate(Math.PI / 2);
+    ctx.rotate(-Math.PI / 2);
     ctx.drawImage(image, 0, 0, along, across);
     ctx.restore();
-    return along / across;
+  } else {
+    const ink = luminance(color) > 0.5 ? [0, 0, 0] : [1, 1, 1];
+    ctx.fillStyle = toCss(ink, 0.05);
+    for (let y = 0; y < along; y += 4) ctx.fillRect(0, y, across, 1);
+    ctx.fillStyle = toCss(ink, 0.2);
+    for (let y = 0; y < along; y += 14) {
+      ctx.fillRect(across * 0.075, y, 2, 8);
+      ctx.fillRect(across * 0.925 - 2, y, 2, 8);
+    }
   }
-  const ink = luminance(color) > 0.5 ? [0, 0, 0] : [1, 1, 1];
-  ctx.fillStyle = toCss(ink, 0.05);
-  for (let y = 0; y < along; y += 4) ctx.fillRect(0, y, across, 1);
-  ctx.fillStyle = toCss(ink, 0.2);
-  for (let y = 0; y < along; y += 14) {
-    ctx.fillRect(across * 0.075, y, 2, 8);
-    ctx.fillRect(across * 0.925 - 2, y, 2, 8);
+  if (label) {
+    ctx.save();
+    ctx.translate(across / 2, along / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillStyle = '#f8fafc';
+    ctx.font = `bold ${Math.round(across * 0.22)}px Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, 0, 0, along - 24);
+    ctx.restore();
   }
   return along / across;
 };
@@ -714,6 +727,7 @@ const Lanyard = ({
   strapLength = 0.5,
   strapImage,
   strapColor = '#111111',
+  strapLabel = '',
   strapWidth = 0.65,
   metal = 'silver',
   gravity = 1,
@@ -742,6 +756,7 @@ const Lanyard = ({
     strapLength,
     strapImage,
     strapColor,
+    strapLabel,
     strapWidth,
     metal,
     gravity,
@@ -905,10 +920,22 @@ const Lanyard = ({
 
     const repaintStrap = () => {
       const s = settingsRef.current;
-      tileRatio = paintStrap(strapCanvas, images.strap, parseColor(s.strapColor, [0.07, 0.07, 0.07]));
+      const currentStrapWidth = STRAP_WIDTH * clamp(s.strapWidth, 0.4, 2);
+      tileRatio = paintStrap(
+        strapCanvas,
+        images.strap,
+        parseColor(s.strapColor, [0.07, 0.07, 0.07]),
+        s.strapLabel,
+        sim.rest * JOINTS,
+        currentStrapWidth
+      );
       weave.repeat.set(2, 2 * tileRatio);
       strapTexture.dispose();
       strapTexture.needsUpdate = true;
+      applied.strapLabel = s.strapLabel;
+      applied.strapColor = s.strapColor;
+      applied.strapWidth = s.strapWidth;
+      applied.strapLength = s.strapLength;
       start();
     };
 
@@ -984,7 +1011,14 @@ const Lanyard = ({
       }
       const faceKey = `${layoutKey}|${s.cardColor}|${s.imageFit}`;
       if (faceKey !== applied.faceKey) paintFaces();
-      if (s.strapColor !== applied.strapColor) repaintStrap();
+      if (
+        s.strapColor !== applied.strapColor ||
+        s.strapLabel !== applied.strapLabel ||
+        s.strapWidth !== applied.strapWidth ||
+        s.strapLength !== applied.strapLength
+      ) {
+        repaintStrap();
+      }
 
       const finish = FINISHES[s.finish] || FINISHES.glossy;
       const card = parseColor(s.cardColor, [1, 1, 1]);
@@ -1012,7 +1046,17 @@ const Lanyard = ({
       }
       canvas.style.touchAction = s.interactive ? 'pan-y' : 'auto';
 
-      applied = { layoutKey, framingKey, imageKey, faceKey, strapColor: s.strapColor, strapScale };
+      applied = {
+        layoutKey,
+        framingKey,
+        imageKey,
+        faceKey,
+        strapColor: s.strapColor,
+        strapLabel: s.strapLabel,
+        strapWidth: s.strapWidth,
+        strapLength: s.strapLength,
+        strapScale
+      };
       start();
     };
 
@@ -1168,7 +1212,7 @@ const Lanyard = ({
 
     const pickCard = () => {
       cardGroup.updateMatrixWorld();
-      const hits = raycaster.intersectObjects([bodyMesh, frontMesh, backMesh], false);
+      const hits = raycaster.intersectObjects([bodyMesh, frontMesh, backMesh, band], false);
       return hits[0] || null;
     };
 
@@ -1200,7 +1244,13 @@ const Lanyard = ({
         from: hit.point.clone(),
         target: hit.point.clone()
       };
-      press = { x: event.clientX, y: event.clientY, time: performance.now(), point: hit.point.clone() };
+      press = {
+        x: event.clientX,
+        y: event.clientY,
+        time: performance.now(),
+        point: hit.point.clone(),
+        canFlip: hit.object !== band
+      };
       canvas.setPointerCapture?.(event.pointerId);
       setCursor('grabbing');
       event.preventDefault();
@@ -1224,7 +1274,9 @@ const Lanyard = ({
     const onPointerUp = event => {
       if (!sim.grab) return;
       sim.grab = null;
-      if (press && event.type === 'pointerup' && performance.now() - press.time < 450) flip(press.point);
+      if (press?.canFlip && event.type === 'pointerup' && performance.now() - press.time < 450) {
+        flip(press.point);
+      }
       press = null;
       canvas.releasePointerCapture?.(event.pointerId);
       setCursor(hovering && event.pointerType !== 'touch' ? 'grab' : '');
